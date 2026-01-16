@@ -278,13 +278,21 @@
         setupFileInput('r2-input', 'r2-box', 'r2-info', 'r2-name', 'r2');
 
         document.getElementById('analyze-btn').addEventListener('click', () => {
+            const btn = document.getElementById('analyze-btn');
+            
             // Store file names for the next page
             localStorage.setItem('r1FileName', r1File.name);
             localStorage.setItem('r2FileName', r2File.name);
             
-            // Navigate to results page
-            alert('Analysis started! Opening results dashboard');
-            window.location.href = 'results.html';
+            // Show loading state
+            btn.textContent = '🔬 Analyzing...';
+            btn.style.background = '#cbd5e0';
+            btn.disabled = true;
+            
+            // Simulate processing delay then navigate
+            setTimeout(() => {
+                window.location.href = 'results.html';
+            }, 1500);
         });
     </script>
 </body>
