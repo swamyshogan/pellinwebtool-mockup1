@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sequencing Data Analysis Platform</title>
+    <title>Pellin Web Tool - Sequencing Data Analysis</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -23,27 +23,86 @@
 
         .container {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
+            border-radius: 24px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+            max-width: 800px;
             width: 100%;
-            padding: 40px;
+            padding: 0;
+            overflow: hidden;
         }
 
         .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
             text-align: center;
-            margin-bottom: 40px;
+            padding: 40px 40px 30px;
         }
 
         .header h1 {
-            color: #2d3748;
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
         .header p {
-            color: #718096;
-            font-size: 14px;
+            font-size: 15px;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .content-wrapper {
+            padding: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 30px;
+            gap: 8px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: #3b82f6;
+            background: #f3f4f6;
+        }
+
+        .tab.active {
+            color: #1e3a8a;
+            border-bottom-color: #3b82f6;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .upload-section {
@@ -53,45 +112,49 @@
         .upload-label {
             display: block;
             font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 10px;
-            font-size: 14px;
+            color: #1f2937;
+            margin-bottom: 12px;
+            font-size: 15px;
         }
 
         .upload-box {
-            border: 2px dashed #cbd5e0;
+            border: 2px dashed #d1d5db;
             border-radius: 12px;
-            padding: 30px;
+            padding: 35px;
             text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
-            background: #f7fafc;
+            background: #f9fafb;
             position: relative;
         }
 
         .upload-box:hover {
-            border-color: #667eea;
-            background: #edf2f7;
+            border-color: #3b82f6;
+            background: #eff6ff;
         }
 
         .upload-box.dragover {
-            border-color: #667eea;
-            background: #e6f0ff;
+            border-color: #3b82f6;
+            background: #dbeafe;
+            transform: scale(1.02);
         }
 
         .upload-icon {
             font-size: 48px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            opacity: 0.7;
         }
 
         .upload-text {
-            color: #4a5568;
-            margin-bottom: 5px;
+            color: #374151;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 15px;
         }
 
         .upload-subtext {
-            color: #a0aec0;
-            font-size: 12px;
+            color: #9ca3af;
+            font-size: 13px;
         }
 
         input[type="file"] {
@@ -100,10 +163,11 @@
 
         .file-info {
             margin-top: 15px;
-            padding: 15px;
-            background: #e6fffa;
-            border-radius: 8px;
+            padding: 15px 18px;
+            background: #d1fae5;
+            border-radius: 10px;
             display: none;
+            border: 1px solid #a7f3d0;
         }
 
         .file-info.active {
@@ -111,23 +175,125 @@
         }
 
         .file-name {
-            color: #2d3748;
+            color: #065f46;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .file-name::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .deg-settings {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .deg-section {
+            margin-bottom: 30px;
+        }
+
+        .deg-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .deg-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .file-name::before {
-            content: "✓";
-            color: #38a169;
-            font-weight: bold;
+        .deg-section-title::before {
+            content: "▸";
+            color: #3b82f6;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: white;
+            color: #1f2937;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #3b82f6;
+        }
+
+        .checkbox-group label {
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: "▼";
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            pointer-events: none;
+            font-size: 12px;
         }
 
         .analyze-btn {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 18px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: white;
             border: none;
             border-radius: 12px;
@@ -136,92 +302,272 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 30px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
-        .analyze-btn:hover {
+        .analyze-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .analyze-btn:active:not(:disabled) {
+            transform: translateY(0);
         }
 
         .analyze-btn:disabled {
-            background: #cbd5e0;
+            background: #d1d5db;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
         .requirements {
-            background: #fffaf0;
-            border-left: 4px solid #f6ad55;
-            padding: 15px;
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 18px;
             margin-top: 30px;
-            border-radius: 4px;
+            border-radius: 8px;
         }
 
         .requirements h3 {
-            color: #744210;
-            font-size: 14px;
-            margin-bottom: 8px;
+            color: #92400e;
+            font-size: 15px;
+            margin-bottom: 10px;
+            font-weight: 600;
         }
 
         .requirements ul {
-            color: #744210;
-            font-size: 13px;
+            color: #78350f;
+            font-size: 14px;
             margin-left: 20px;
+            line-height: 1.6;
         }
 
         .requirements li {
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+        }
+
+        .toggle-advanced {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .toggle-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .toggle-link:hover {
+            color: #1e3a8a;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧬 Sequencing Analysis Platform</h1>
-            <p>Upload paired-end FASTQ files for analysis</p>
+            <h1>Pellin Web Tool</h1>
+            <p>Sequencing Data Analysis Platform</p>
         </div>
 
-        <div class="upload-section">
-            <label class="upload-label">Read 1 (R1) FASTQ File</label>
-            <div class="upload-box" id="r1-box" onclick="document.getElementById('r1-input').click()">
-                <div class="upload-icon">📁</div>
-                <div class="upload-text">Click or drag to upload R1</div>
-                <div class="upload-subtext">Accepts .fastq, .fq, .fastq.gz files</div>
+        <div class="content-wrapper">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('upload')">File Upload</button>
+                <button class="tab" onclick="switchTab('deg')" id="deg-tab">DEG Analysis Options</button>
             </div>
-            <input type="file" id="r1-input" accept=".fastq,.fq,.fastq.gz,.fq.gz">
-            <div class="file-info" id="r1-info">
-                <div class="file-name" id="r1-name"></div>
-            </div>
-        </div>
 
-        <div class="upload-section">
-            <label class="upload-label">Read 2 (R2) FASTQ File</label>
-            <div class="upload-box" id="r2-box" onclick="document.getElementById('r2-input').click()">
-                <div class="upload-icon">📁</div>
-                <div class="upload-text">Click or drag to upload R2</div>
-                <div class="upload-subtext">Accepts .fastq, .fq, .fastq.gz files</div>
-            </div>
-            <input type="file" id="r2-input" accept=".fastq,.fq,.fastq.gz,.fq.gz">
-            <div class="file-info" id="r2-info">
-                <div class="file-name" id="r2-name"></div>
-            </div>
-        </div>
+            <!-- Upload Tab -->
+            <div id="upload-tab" class="tab-content active">
+                <div class="upload-section">
+                    <label class="upload-label">Read 1 (R1) FASTQ File</label>
+                    <div class="upload-box" id="r1-box" onclick="document.getElementById('r1-input').click()">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Click or drag to upload R1</div>
+                        <div class="upload-subtext">Accepts .fastq, .fq, .fastq.gz, .fq.gz files</div>
+                    </div>
+                    <input type="file" id="r1-input" accept=".fastq,.fq,.fastq.gz,.fq.gz">
+                    <div class="file-info" id="r1-info">
+                        <div class="file-name" id="r1-name"></div>
+                    </div>
+                </div>
 
-        <button class="analyze-btn" id="analyze-btn" disabled>Analyze Sequences</button>
+                <div class="upload-section">
+                    <label class="upload-label">Read 2 (R2) FASTQ File</label>
+                    <div class="upload-box" id="r2-box" onclick="document.getElementById('r2-input').click()">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Click or drag to upload R2</div>
+                        <div class="upload-subtext">Accepts .fastq, .fq, .fastq.gz, .fq.gz files</div>
+                    </div>
+                    <input type="file" id="r2-input" accept=".fastq,.fq,.fastq.gz,.fq.gz">
+                    <div class="file-info" id="r2-info">
+                        <div class="file-name" id="r2-name"></div>
+                    </div>
+                </div>
 
-        <div class="requirements">
-            <h3>📋 Requirements</h3>
-            <ul>
-                <li>Both R1 and R2 files must be uploaded</li>
-                <li>Files should be paired-end reads from the same sample</li>
-                <li>Supported formats: FASTQ, compressed FASTQ (.gz)</li>
-            </ul>
+                <div class="requirements">
+                    <h3>📋 Requirements</h3>
+                    <ul>
+                        <li>Both R1 and R2 files must be uploaded</li>
+                        <li>Files should be paired-end reads from the same sample</li>
+                        <li>Supported formats: FASTQ, compressed FASTQ (.gz)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- DEG Analysis Options Tab -->
+            <div id="deg-tab-content" class="tab-content">
+                <div class="deg-settings">
+                    <div class="deg-section">
+                        <div class="deg-section-title">Basic Alignment Settings</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Alignment Algorithm</label>
+                            <div class="select-wrapper">
+                                <select class="form-control" id="alignment-algorithm">
+                                    <option value="star">STAR (Recommended)</option>
+                                    <option value="hisat2">HISAT2</option>
+                                    <option value="tophat2">TopHat2</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Reference Genome</label>
+                            <div class="select-wrapper">
+                                <select class="form-control" id="reference-genome">
+                                    <option value="hg38">Human (GRCh38/hg38)</option>
+                                    <option value="hg19">Human (GRCh37/hg19)</option>
+                                    <option value="mm10">Mouse (mm10)</option>
+                                    <option value="mm39">Mouse (mm39)</option>
+                                    <option value="custom">Custom Reference</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Alignment Parameters</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="allow-multimap" checked>
+                                <label for="allow-multimap">Allow multi-mapping reads</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="strand-specific">
+                                <label for="strand-specific">Strand-specific alignment</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="deg-section">
+                        <div class="deg-section-title">Expression Level Analysis</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Quantification Method</label>
+                            <div class="select-wrapper">
+                                <select class="form-control" id="quantification-method">
+                                    <option value="featurecounts">featureCounts</option>
+                                    <option value="htseq">HTSeq</option>
+                                    <option value="salmon">Salmon</option>
+                                    <option value="kallisto">Kallisto</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Normalization Method</label>
+                            <div class="select-wrapper">
+                                <select class="form-control" id="normalization-method">
+                                    <option value="tpm">TPM (Transcripts Per Million)</option>
+                                    <option value="fpkm">FPKM (Fragments Per Kilobase Million)</option>
+                                    <option value="rpkm">RPKM (Reads Per Kilobase Million)</option>
+                                    <option value="deseq2">DESeq2 Normalization</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Minimum Expression Threshold</label>
+                            <input type="number" class="form-control" id="min-expression" value="1" min="0" step="0.1" placeholder="Minimum expression value">
+                        </div>
+                    </div>
+
+                    <div class="deg-section">
+                        <div class="deg-section-title">Gene Annotation & Naming</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Gene ID Type</label>
+                            <div class="select-wrapper">
+                                <select class="form-control" id="gene-id-type">
+                                    <option value="ensembl">Ensembl Gene ID</option>
+                                    <option value="entrez">Entrez Gene ID</option>
+                                    <option value="symbol">Gene Symbol</option>
+                                    <option value="refseq">RefSeq ID</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Annotation Database</label>
+                            <div class="select-wrapper">
+                                <select class="form-control" id="annotation-db">
+                                    <option value="ensembl">Ensembl</option>
+                                    <option value="gencode">GENCODE</option>
+                                    <option value="refseq">RefSeq</option>
+                                    <option value="ucsc">UCSC</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Include Additional Annotations</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="include-description">
+                                <label for="include-description">Gene description</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="include-biotype">
+                                <label for="include-biotype">Gene biotype</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="include-chromosome">
+                                <label for="include-chromosome">Chromosome location</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="analyze-btn" id="analyze-btn" disabled>Analyze Sequences</button>
         </div>
     </div>
 
     <script>
         let r1File = null;
         let r2File = null;
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            if (tabName === 'upload') {
+                document.getElementById('upload-tab').classList.add('active');
+                document.querySelectorAll('.tab')[0].classList.add('active');
+            } else if (tabName === 'deg') {
+                document.getElementById('deg-tab-content').classList.add('active');
+                document.querySelectorAll('.tab')[1].classList.add('active');
+            }
+        }
 
         function setupFileInput(inputId, boxId, infoId, nameId, fileVarName) {
             const input = document.getElementById(inputId);
@@ -274,19 +620,43 @@
             }
         }
 
+        function getDEGSettings() {
+            return {
+                alignment: {
+                    algorithm: document.getElementById('alignment-algorithm').value,
+                    referenceGenome: document.getElementById('reference-genome').value,
+                    allowMultimap: document.getElementById('allow-multimap').checked,
+                    strandSpecific: document.getElementById('strand-specific').checked
+                },
+                expression: {
+                    quantificationMethod: document.getElementById('quantification-method').value,
+                    normalizationMethod: document.getElementById('normalization-method').value,
+                    minExpression: parseFloat(document.getElementById('min-expression').value)
+                },
+                annotation: {
+                    geneIdType: document.getElementById('gene-id-type').value,
+                    annotationDb: document.getElementById('annotation-db').value,
+                    includeDescription: document.getElementById('include-description').checked,
+                    includeBiotype: document.getElementById('include-biotype').checked,
+                    includeChromosome: document.getElementById('include-chromosome').checked
+                }
+            };
+        }
+
         setupFileInput('r1-input', 'r1-box', 'r1-info', 'r1-name', 'r1');
         setupFileInput('r2-input', 'r2-box', 'r2-info', 'r2-name', 'r2');
 
         document.getElementById('analyze-btn').addEventListener('click', () => {
             const btn = document.getElementById('analyze-btn');
             
-            // Store file names for the next page
+            // Store file names and DEG settings for the next page
             localStorage.setItem('r1FileName', r1File.name);
             localStorage.setItem('r2FileName', r2File.name);
+            localStorage.setItem('degSettings', JSON.stringify(getDEGSettings()));
             
             // Show loading state
             btn.textContent = '🔬 Analyzing...';
-            btn.style.background = '#cbd5e0';
+            btn.style.background = '#d1d5db';
             btn.disabled = true;
             
             // Simulate processing delay then navigate
