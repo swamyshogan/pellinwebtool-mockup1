@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analysis Results - Sequencing Platform</title>
+    <title>Analysis Results - Pellin Web Tool</title>
     <style>
         * {
             margin: 0;
@@ -13,27 +13,32 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f5f7fa;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
             min-height: 100vh;
+            padding-bottom: 40px;
         }
 
         .navbar {
             background: white;
             padding: 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
         }
 
         .navbar-header {
-            padding: 20px 40px;
+            padding: 25px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #e5e7eb;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         }
 
         .navbar h1 {
-            color: #2d3748;
-            font-size: 24px;
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .nav-buttons {
@@ -42,18 +47,21 @@
         }
 
         .back-btn {
-            padding: 10px 20px;
-            background: #667eea;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            border: none;
-            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.3s;
+            backdrop-filter: blur(10px);
         }
 
         .back-btn:hover {
-            background: #5568d3;
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
         }
 
         .tabs-nav {
@@ -99,7 +107,7 @@
 
         .container {
             max-width: 1400px;
-            margin: 30px auto;
+            margin: 0 auto;
             padding: 0 40px;
         }
 
@@ -112,9 +120,15 @@
 
         .card {
             background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         }
 
         .card-header {
@@ -138,9 +152,9 @@
 
         .chart-section {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
 
@@ -167,19 +181,70 @@
 
         .tooltip {
             position: absolute;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(30, 58, 138, 0.95);
             color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
+            padding: 0;
+            border-radius: 10px;
+            font-size: 13px;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s ease;
             z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            min-width: 220px;
+            max-width: 300px;
         }
 
         .tooltip.active {
             opacity: 1;
+        }
+
+        .tooltip-header {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 16px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 700;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tooltip-content {
+            padding: 12px 16px;
+        }
+
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tooltip-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .tooltip-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .tooltip-value {
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: right;
+        }
+
+        .tooltip-go {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 12px;
+            line-height: 1.5;
+            font-style: italic;
         }
 
         .grid {
@@ -196,12 +261,13 @@
 
         .badge {
             display: inline-block;
-            padding: 4px 12px;
-            background: #c6f6d5;
-            color: #22543d;
+            padding: 5px 14px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
+            color: white;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
 
         .legend {
@@ -317,12 +383,12 @@
             </div>
             <div class="legend">
                 <div class="legend-item">
-                    <div class="legend-color" style="background: #e53e3e;"></div>
-                    <span>Upregulated (log2FC > 1, padj < 0.05)</span>
+                    <div class="legend-color" style="background: #ef4444;"></div>
+                    <span>Upregulated (log₂FC > 1, padj < 0.05)</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background: #3182ce;"></div>
-                    <span>Downregulated (log2FC < -1, padj < 0.05)</span>
+                    <div class="legend-color" style="background: #3b82f6;"></div>
+                    <span>Downregulated (log₂FC < -1, padj < 0.05)</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background: #a0aec0;"></div>
@@ -586,10 +652,27 @@
             const graphWidth = width - 2 * padding;
             const graphHeight = height - 2 * padding;
 
-            // Generate mock differential expression data
+            // Generate mock differential expression data with Gene Ontology terms
             const numGenes = 500;
             const genes = [];
             const geneNames = ['GREM1', 'TP53', 'EGFR', 'KRAS', 'BRCA1', 'MYC', 'PTEN', 'AKT1', 'VEGFA', 'TGFB1'];
+            const goTerms = [
+                'GO:0007155 (cell adhesion)',
+                'GO:0006915 (apoptotic process)',
+                'GO:0007165 (signal transduction)',
+                'GO:0007166 (cell surface receptor signaling)',
+                'GO:0006281 (DNA repair)',
+                'GO:0006355 (regulation of transcription)',
+                'GO:0006468 (protein phosphorylation)',
+                'GO:0008283 (cell proliferation)',
+                'GO:0001525 (angiogenesis)',
+                'GO:0007179 (transforming growth factor beta receptor signaling)',
+                'GO:0007049 (cell cycle)',
+                'GO:0006954 (inflammatory response)',
+                'GO:0006810 (transport)',
+                'GO:0005975 (carbohydrate metabolic process)',
+                'GO:0008152 (metabolic process)'
+            ];
             
             for (let i = 0; i < numGenes; i++) {
                 const log2FC = (Math.random() - 0.5) * 8; // -4 to 4
@@ -600,11 +683,16 @@
                 const isSignificant = Math.random() > 0.85;
                 const finalNegLog10P = isSignificant ? 2 + Math.random() * 4 : negLog10P;
                 
+                // Assign GO term (more likely to have one if significant)
+                const hasGO = isSignificant || Math.random() > 0.7;
+                const goTerm = hasGO ? goTerms[Math.floor(Math.random() * goTerms.length)] : null;
+                
                 genes.push({
                     log2FC: log2FC,
                     negLog10P: finalNegLog10P,
                     name: i < geneNames.length ? geneNames[i] : `Gene${i}`,
-                    isLabeled: i < geneNames.length
+                    isLabeled: i < geneNames.length,
+                    goTerm: goTerm
                 });
             }
 
@@ -679,30 +767,50 @@
             
             ctx.setLineDash([]);
 
+            // Store gene positions for interaction
+            const genePositions = [];
+
             // Draw points
-            genes.forEach(gene => {
+            genes.forEach((gene, index) => {
                 const x = padding + ((gene.log2FC - minFC) / (maxFC - minFC)) * graphWidth;
                 const y = height - padding - (gene.negLog10P / maxP) * graphHeight;
                 
+                // Store position for tooltip interaction
+                genePositions.push({ gene, x, y, index });
+                
                 // Determine color based on significance
                 let color = '#a0aec0'; // Not significant
+                let pointSize = 3;
                 if (gene.negLog10P > 1.3 && Math.abs(gene.log2FC) > 1) {
-                    color = gene.log2FC > 0 ? '#e53e3e' : '#3182ce'; // Red for up, blue for down
+                    color = gene.log2FC > 0 ? '#ef4444' : '#3b82f6'; // Red for up, blue for down
+                    pointSize = 4;
                 }
                 
+                // Draw point with hover effect
                 ctx.fillStyle = color;
-                ctx.globalAlpha = 0.6;
+                ctx.globalAlpha = 0.7;
                 ctx.beginPath();
-                ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                ctx.arc(x, y, pointSize, 0, 2 * Math.PI);
                 ctx.fill();
+                
+                // Add subtle glow for significant genes
+                if (gene.negLog10P > 1.3 && Math.abs(gene.log2FC) > 1) {
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, pointSize + 1, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+                
                 ctx.globalAlpha = 1;
                 
                 // Label significant genes
                 if (gene.isLabeled && gene.negLog10P > 1.3 && Math.abs(gene.log2FC) > 1) {
-                    ctx.fillStyle = '#2d3748';
-                    ctx.font = 'bold 10px sans-serif';
+                    ctx.fillStyle = '#1e3a8a';
+                    ctx.font = 'bold 11px sans-serif';
                     ctx.textAlign = 'center';
-                    ctx.fillText(gene.name, x, y - 8);
+                    ctx.fillText(gene.name, x, y - 10);
                 }
             });
 
@@ -718,7 +826,9 @@
             ctx.fillText('-log₁₀ (adjusted p-value)', 0, 0);
             ctx.restore();
 
-            // Interactive tooltip
+            // Interactive tooltip with enhanced information
+            let hoveredGene = null;
+            
             canvas.addEventListener('mousemove', (e) => {
                 const rect = canvas.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
@@ -728,34 +838,88 @@
                 let nearest = null;
                 let minDist = Infinity;
                 
-                genes.forEach(gene => {
-                    const x = padding + ((gene.log2FC - minFC) / (maxFC - minFC)) * graphWidth;
-                    const y = height - padding - (gene.negLog10P / maxP) * graphHeight;
+                genePositions.forEach(({ gene, x, y }) => {
                     const dist = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
                     
-                    if (dist < 10 && dist < minDist) {
+                    if (dist < 12 && dist < minDist) {
                         minDist = dist;
                         nearest = gene;
                     }
                 });
                 
                 if (nearest) {
+                    hoveredGene = nearest;
                     const padj = Math.pow(10, -nearest.negLog10P);
-                    tooltip.innerHTML = `
-                        <strong>${nearest.name}</strong><br>
-                        log₂FC: ${nearest.log2FC.toFixed(2)}<br>
-                        padj: ${padj.toExponential(2)}
+                    
+                    // Build tooltip HTML
+                    let tooltipHTML = `
+                        <div class="tooltip-header">${nearest.name}</div>
+                        <div class="tooltip-content">
+                            <div class="tooltip-row">
+                                <span class="tooltip-label">log₂ Fold Change:</span>
+                                <span class="tooltip-value" style="color: ${nearest.log2FC > 0 ? '#ef4444' : '#3b82f6'}">${nearest.log2FC > 0 ? '+' : ''}${nearest.log2FC.toFixed(3)}</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-label">Adjusted p-value:</span>
+                                <span class="tooltip-value">${padj.toExponential(2)}</span>
+                            </div>
                     `;
-                    tooltip.style.left = e.clientX - rect.left + 10 + 'px';
-                    tooltip.style.top = e.clientY - rect.top - 50 + 'px';
+                    
+                    if (nearest.goTerm) {
+                        tooltipHTML += `
+                            <div class="tooltip-row" style="flex-direction: column; align-items: flex-start;">
+                                <span class="tooltip-label" style="margin-bottom: 4px;">Gene Ontology Top Hit:</span>
+                                <span class="tooltip-go">${nearest.goTerm}</span>
+                            </div>
+                        `;
+                    } else {
+                        tooltipHTML += `
+                            <div class="tooltip-row" style="flex-direction: column; align-items: flex-start;">
+                                <span class="tooltip-go" style="color: rgba(255, 255, 255, 0.6);">No GO annotation available</span>
+                            </div>
+                        `;
+                    }
+                    
+                    tooltipHTML += `</div>`;
+                    tooltip.innerHTML = tooltipHTML;
+                    
+                    // Position tooltip (avoid going off screen)
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    let leftPos = e.clientX - rect.left + 15;
+                    let topPos = e.clientY - rect.top - 10;
+                    
+                    // Adjust if tooltip goes off right edge
+                    if (leftPos + tooltipRect.width > rect.width) {
+                        leftPos = e.clientX - rect.left - tooltipRect.width - 15;
+                    }
+                    
+                    // Adjust if tooltip goes off bottom edge
+                    if (topPos + tooltipRect.height > rect.height) {
+                        topPos = e.clientY - rect.top - tooltipRect.height - 10;
+                    }
+                    
+                    // Adjust if tooltip goes off top edge
+                    if (topPos < 0) {
+                        topPos = 10;
+                    }
+                    
+                    tooltip.style.left = leftPos + 'px';
+                    tooltip.style.top = topPos + 'px';
                     tooltip.classList.add('active');
+                    
+                    // Change cursor
+                    canvas.style.cursor = 'pointer';
                 } else {
+                    hoveredGene = null;
                     tooltip.classList.remove('active');
+                    canvas.style.cursor = 'crosshair';
                 }
             });
 
             canvas.addEventListener('mouseleave', () => {
                 tooltip.classList.remove('active');
+                hoveredGene = null;
+                canvas.style.cursor = 'crosshair';
             });
         }
 
