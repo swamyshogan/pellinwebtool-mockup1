@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download Scripts</title>
+    <title>Edit Analysis Scripts - Pellin Web Tool</title>
     <style>
         * {
             margin: 0;
@@ -12,18 +12,66 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: #f5f7fa;
             min-height: 100vh;
-            padding: 20px;
+        }
+
+        .navbar {
+            background: white;
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .navbar h1 {
+            color: #2d3748;
+            font-size: 24px;
+        }
+
+        .tabs-nav {
+            display: flex;
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab-nav {
+            padding: 16px 32px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.3s ease;
+        }
+
+        .tab-nav:hover {
+            color: #3b82f6;
+            background: #f3f4f6;
+        }
+
+        .tab-nav.active {
+            color: #1e3a8a;
+            border-bottom-color: #3b82f6;
+            background: white;
         }
 
         .container {
-            max-width: 900px;
-            margin: 0 auto;
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 40px;
         }
 
-        .header {
+        .page-header {
             background: white;
             padding: 30px;
             border-radius: 12px;
@@ -31,169 +79,620 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
-        h1 {
+        .page-header h2 {
             color: #2d3748;
+            font-size: 28px;
             margin-bottom: 10px;
         }
 
-        .subtitle {
+        .page-header p {
             color: #718096;
+            font-size: 15px;
         }
 
-        .script-card {
+        .script-section {
             background: white;
-            padding: 25px;
+            padding: 30px;
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
-        .script-card h2 {
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-size: 20px;
+        .script-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
-        .script-card p {
-            color: #4a5568;
-            margin-bottom: 15px;
+        .script-section-title {
+            color: #2d3748;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .script-section-title::before {
+            content: "📊";
+            font-size: 24px;
+        }
+
+        .script-description {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 20px;
             line-height: 1.6;
         }
 
-        .download-btn {
-            background: #48bb78;
-            color: white;
-            padding: 12px 24px;
-            border: none;
+        .code-editor-wrapper {
+            position: relative;
+            border: 2px solid #e5e7eb;
             border-radius: 8px;
-            cursor: pointer;
+            overflow: hidden;
+            background: #1e293b;
+        }
+
+        .code-editor-header {
+            background: #0f172a;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .code-editor-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .code-language {
+            color: #94a3b8;
+            font-size: 12px;
             font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .code-editor-header-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .code-dot.red { background: #ef4444; }
+        .code-dot.yellow { background: #f59e0b; }
+        .code-dot.green { background: #10b981; }
+
+        textarea.code-editor {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px;
+            background: #1e293b;
+            color: #e2e8f0;
+            border: none;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
             font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            tab-size: 4;
         }
 
-        .download-btn:hover {
-            background: #38a169;
+        textarea.code-editor:focus {
+            outline: none;
         }
 
-        .back-btn {
-            background: #667eea;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
+        .script-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
             margin-top: 20px;
         }
 
-        .back-btn:hover {
-            background: #5568d3;
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .submit-all-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .submit-all-section h3 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .submit-all-section p {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .btn-large {
+            padding: 16px 40px;
+            font-size: 16px;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .info-box p {
+            color: #1e40af;
+            font-size: 14px;
+            margin: 0;
         }
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <div class="navbar-header">
+            <h1>Pellin Web Tool</h1>
+        </div>
+        <div class="tabs-nav">
+            <button class="tab-nav" onclick="window.location.href='results.html'">Results</button>
+            <button class="tab-nav active">Edit Analysis Script</button>
+        </div>
+    </div>
+
     <div class="container">
-        <div class="header">
-            <h1>📜 Analysis Scripts</h1>
-            <p class="subtitle">Download the scripts used for your analysis</p>
+        <div class="page-header">
+            <h2>Edit Analysis Scripts</h2>
+            <p>Modify the scripts used to generate each visualization. Changes will be applied when you submit.</p>
         </div>
 
-        <div class="script-card">
-            <h2>DESeq2 Analysis Script</h2>
-            <p>Complete R script for differential expression analysis including quality control, normalization, and visualization.</p>
-            <button class="download-btn" onclick="downloadScript('deseq2')">⬇️ Download DESeq2.R</button>
+        <div class="info-box">
+            <p>💡 <strong>Note:</strong> This is a mockup interface. Script modifications will be saved and reflected visually on the results page.</p>
         </div>
 
-        <div class="script-card">
-            <h2>Quality Control Pipeline</h2>
-            <p>Python script for running FastQC and MultiQC on your FASTQ files.</p>
-            <button class="download-btn" onclick="downloadScript('qc')">⬇️ Download QC_Pipeline.py</button>
+        <!-- Quality Score Distribution Script -->
+        <div class="script-section">
+            <div class="script-section-header">
+                <div class="script-section-title">Quality Score Distribution</div>
+            </div>
+            <div class="script-description">
+                JavaScript code for generating the quality score distribution chart showing R1 and R2 read quality across positions.
+            </div>
+            <div class="code-editor-wrapper">
+                <div class="code-editor-header">
+                    <div class="code-editor-header-left">
+                        <span class="code-language">JavaScript</span>
+                    </div>
+                    <div class="code-editor-header-right">
+                        <div class="code-dot red"></div>
+                        <div class="code-dot yellow"></div>
+                        <div class="code-dot green"></div>
+                    </div>
+                </div>
+                <textarea class="code-editor" id="quality-script" spellcheck="false">function drawQualityChart() {
+    const canvas = document.getElementById('qualityCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = canvas.offsetWidth * 2;
+    canvas.height = canvas.offsetHeight * 2;
+    ctx.scale(2, 2);
+
+    const width = canvas.offsetWidth;
+    const height = canvas.offsetHeight;
+    const padding = 40;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+
+    // Generate data
+    const positions = 150;
+    const r1Data = Array(positions).fill(0).map((_, i) => 
+        30 + Math.random() * 8 + Math.sin(i / 20) * 2
+    );
+    const r2Data = Array(positions).fill(0).map((_, i) => 
+        28 + Math.random() * 8 + Math.sin(i / 15) * 3
+    );
+
+    // Draw axes and grid
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, height - padding);
+    ctx.lineTo(width - padding, height - padding);
+    ctx.stroke();
+
+    // Draw R1 and R2 data lines
+    ctx.strokeStyle = '#667eea';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    r1Data.forEach((val, i) => {
+        const x = padding + (i / positions) * graphWidth;
+        const y = height - padding - ((val / 40) * graphHeight);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    ctx.strokeStyle = '#f6ad55';
+    ctx.beginPath();
+    r2Data.forEach((val, i) => {
+        const x = padding + (i / positions) * graphWidth;
+        const y = height - padding - ((val / 40) * graphHeight);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+}</textarea>
+            </div>
+            <div class="script-actions">
+                <button class="btn btn-secondary" onclick="resetScript('quality-script', 'quality')">Reset</button>
+            </div>
         </div>
 
-        <div class="script-card">
-            <h2>Alignment Pipeline</h2>
-            <p>Bash script for STAR alignment and featureCounts quantification.</p>
-            <button class="download-btn" onclick="downloadScript('alignment')">⬇️ Download Alignment.sh</button>
+        <!-- Base Composition Script -->
+        <div class="script-section">
+            <div class="script-section-header">
+                <div class="script-section-title">Base Composition Chart</div>
+            </div>
+            <div class="script-description">
+                JavaScript code for generating the pie chart showing nucleotide composition (A, T, G, C percentages).
+            </div>
+            <div class="code-editor-wrapper">
+                <div class="code-editor-header">
+                    <div class="code-editor-header-left">
+                        <span class="code-language">JavaScript</span>
+                    </div>
+                    <div class="code-editor-header-right">
+                        <div class="code-dot red"></div>
+                        <div class="code-dot yellow"></div>
+                        <div class="code-dot green"></div>
+                    </div>
+                </div>
+                <textarea class="code-editor" id="base-script" spellcheck="false">function drawBaseChart() {
+    const canvas = document.getElementById('baseCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = canvas.offsetWidth * 2;
+    canvas.height = canvas.offsetHeight * 2;
+    ctx.scale(2, 2);
+
+    const width = canvas.offsetWidth;
+    const height = canvas.offsetHeight;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) / 2 - 40;
+
+    const bases = ['A', 'T', 'G', 'C'];
+    const percentages = [28.5, 28.2, 21.8, 21.5];
+    const colors = ['#48bb78', '#f6ad55', '#667eea', '#ed64a6'];
+
+    let currentAngle = -Math.PI / 2;
+
+    percentages.forEach((pct, i) => {
+        const sliceAngle = (pct / 100) * 2 * Math.PI;
+        
+        ctx.fillStyle = colors[i];
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fill();
+
+        // Label
+        const labelAngle = currentAngle + sliceAngle / 2;
+        const labelX = centerX + Math.cos(labelAngle) * (radius * 0.7);
+        const labelY = centerY + Math.sin(labelAngle) * (radius * 0.7);
+        
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 18px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(bases[i], labelX, labelY);
+        
+        ctx.font = '12px sans-serif';
+        ctx.fillText(pct + '%', labelX, labelY + 20);
+
+        currentAngle += sliceAngle;
+    });
+}</textarea>
+            </div>
+            <div class="script-actions">
+                <button class="btn btn-secondary" onclick="resetScript('base-script', 'base')">Reset</button>
+            </div>
         </div>
 
-        <button class="back-btn" onclick="window.history.back()">← Back to Results</button>
+        <!-- Read Length Distribution Script -->
+        <div class="script-section">
+            <div class="script-section-header">
+                <div class="script-section-title">Read Length Distribution</div>
+            </div>
+            <div class="script-description">
+                JavaScript code for generating the histogram showing the distribution of read lengths.
+            </div>
+            <div class="code-editor-wrapper">
+                <div class="code-editor-header">
+                    <div class="code-editor-header-left">
+                        <span class="code-language">JavaScript</span>
+                    </div>
+                    <div class="code-editor-header-right">
+                        <div class="code-dot red"></div>
+                        <div class="code-dot yellow"></div>
+                        <div class="code-dot green"></div>
+                    </div>
+                </div>
+                <textarea class="code-editor" id="length-script" spellcheck="false">function drawLengthChart() {
+    const canvas = document.getElementById('lengthCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = canvas.offsetWidth * 2;
+    canvas.height = canvas.offsetHeight * 2;
+    ctx.scale(2, 2);
+
+    const width = canvas.offsetWidth;
+    const height = canvas.offsetHeight;
+    const padding = 40;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+
+    // Generate histogram data
+    const bins = 20;
+    const data = Array(bins).fill(0).map((_, i) => {
+        const peak = bins / 2;
+        const distance = Math.abs(i - peak);
+        return Math.exp(-distance * distance / 10) * 100 + Math.random() * 10;
+    });
+
+    const maxVal = Math.max(...data);
+
+    // Draw axes
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, height - padding);
+    ctx.lineTo(width - padding, height - padding);
+    ctx.stroke();
+
+    // Draw bars
+    const barWidth = graphWidth / bins;
+    data.forEach((val, i) => {
+        const barHeight = (val / maxVal) * graphHeight;
+        const x = padding + i * barWidth;
+        const y = height - padding - barHeight;
+
+        const gradient = ctx.createLinearGradient(x, y, x, height - padding);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x + 2, y, barWidth - 4, barHeight);
+    });
+}</textarea>
+            </div>
+            <div class="script-actions">
+                <button class="btn btn-secondary" onclick="resetScript('length-script', 'length')">Reset</button>
+            </div>
+        </div>
+
+        <!-- Volcano Plot Script -->
+        <div class="script-section">
+            <div class="script-section-header">
+                <div class="script-section-title">Volcano Plot - Differential Expression</div>
+            </div>
+            <div class="script-description">
+                JavaScript code for generating the volcano plot showing differentially expressed genes with log2 fold change and adjusted p-values.
+            </div>
+            <div class="code-editor-wrapper">
+                <div class="code-editor-header">
+                    <div class="code-editor-header-left">
+                        <span class="code-language">JavaScript</span>
+                    </div>
+                    <div class="code-editor-header-right">
+                        <div class="code-dot red"></div>
+                        <div class="code-dot yellow"></div>
+                        <div class="code-dot green"></div>
+                    </div>
+                </div>
+                <textarea class="code-editor" id="volcano-script" spellcheck="false">function drawVolcanoPlot() {
+    const canvas = document.getElementById('volcanoCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = canvas.offsetWidth * 2;
+    canvas.height = canvas.offsetHeight * 2;
+    ctx.scale(2, 2);
+
+    const width = canvas.offsetWidth;
+    const height = canvas.offsetHeight;
+    const padding = 60;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+
+    // Generate mock differential expression data
+    const numGenes = 500;
+    const genes = [];
+    const geneNames = ['GREM1', 'TP53', 'EGFR', 'KRAS', 'BRCA1', 'MYC', 'PTEN', 'AKT1', 'VEGFA', 'TGFB1'];
+    
+    for (let i = 0; i < numGenes; i++) {
+        const log2FC = (Math.random() - 0.5) * 8;
+        const negLog10P = Math.random() * 6;
+        
+        const isSignificant = Math.random() > 0.85;
+        const finalNegLog10P = isSignificant ? 2 + Math.random() * 4 : negLog10P;
+        
+        genes.push({
+            log2FC: log2FC,
+            negLog10P: finalNegLog10P,
+            name: i < geneNames.length ? geneNames[i] : `Gene${i}`,
+            isLabeled: i < geneNames.length
+        });
+    }
+
+    // Draw axes and points
+    const minFC = -4;
+    const maxFC = 4;
+    const maxP = 6;
+
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, height - padding);
+    ctx.lineTo(width - padding, height - padding);
+    ctx.stroke();
+
+    // Draw points
+    genes.forEach(gene => {
+        const x = padding + ((gene.log2FC - minFC) / (maxFC - minFC)) * graphWidth;
+        const y = height - padding - (gene.negLog10P / maxP) * graphHeight;
+        
+        let color = '#a0aec0';
+        if (gene.negLog10P > 1.3 && Math.abs(gene.log2FC) > 1) {
+            color = gene.log2FC > 0 ? '#e53e3e' : '#3182ce';
+        }
+        
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.6;
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    });
+}</textarea>
+            </div>
+            <div class="script-actions">
+                <button class="btn btn-secondary" onclick="resetScript('volcano-script', 'volcano')">Reset</button>
+            </div>
+        </div>
+
+        <!-- Submit Section -->
+        <div class="submit-all-section">
+            <h3>Apply Script Changes</h3>
+            <p>Review your script modifications and click submit to apply changes to the analysis results.</p>
+            <button class="btn btn-primary btn-large" onclick="submitScripts()">✓ Submit All Changes</button>
+        </div>
     </div>
 
     <script>
-        function downloadScript(type) {
-            let content, filename;
-            
-            if (type === 'deseq2') {
-                filename = 'DESeq2_analysis.R';
-                content = `# DESeq2 Differential Expression Analysis
-library(DESeq2)
-library(ggplot2)
+        // Store original scripts
+        const originalScripts = {
+            quality: document.getElementById('quality-script').value,
+            base: document.getElementById('base-script').value,
+            length: document.getElementById('length-script').value,
+            volcano: document.getElementById('volcano-script').value
+        };
 
-# Load data
-counts <- read.table("gene_counts.txt", header=TRUE, row.names=1)
-metadata <- read.csv("metadata.csv", row.names=1)
-
-# Create DESeq2 object
-dds <- DESeqDataSetFromMatrix(countData=counts, colData=metadata, design=~condition)
-
-# Run analysis
-dds <- DESeq(dds)
-res <- results(dds)
-
-# Export results
-write.csv(as.data.frame(res), "DESeq2_results.csv")
-
-# Generate plots
-pdf("volcano_plot.pdf")
-plot(res$log2FoldChange, -log10(res$padj), pch=20)
-dev.off()
-`;
-            } else if (type === 'qc') {
-                filename = 'QC_pipeline.py';
-                content = `#!/usr/bin/env python3
-import subprocess
-import sys
-
-# Run FastQC
-fastqc_cmd = ["fastqc", "-o", "qc_results", "*.fastq.gz"]
-subprocess.run(fastqc_cmd)
-
-# Run MultiQC
-multiqc_cmd = ["multiqc", "qc_results", "-o", "qc_results"]
-subprocess.run(multiqc_cmd)
-
-print("QC analysis complete!")
-`;
-            } else if (type === 'alignment') {
-                filename = 'alignment_pipeline.sh';
-                content = `#!/bin/bash
-
-# STAR Alignment
-STAR --runThreadN 8 \\
-     --genomeDir genome_index \\
-     --readFilesIn R1.fastq.gz R2.fastq.gz \\
-     --readFilesCommand zcat \\
-     --outSAMtype BAM SortedByCoordinate
-
-# Index BAM
-samtools index Aligned.sortedByCoord.out.bam
-
-# Count features
-featureCounts -p -a genes.gtf -o counts.txt Aligned.sortedByCoord.out.bam
-
-echo "Alignment complete!"
-`;
+        function resetScript(textareaId, scriptKey) {
+            if (confirm('Are you sure you want to reset this script to its original version?')) {
+                document.getElementById(textareaId).value = originalScripts[scriptKey];
             }
-            
-            // Create and download file
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
         }
+
+        function submitScripts() {
+            // Get all script values
+            const scripts = {
+                quality: document.getElementById('quality-script').value,
+                base: document.getElementById('base-script').value,
+                length: document.getElementById('length-script').value,
+                volcano: document.getElementById('volcano-script').value
+            };
+
+            // Check if any scripts were modified
+            let modified = false;
+            for (const key in scripts) {
+                if (scripts[key] !== originalScripts[key]) {
+                    modified = true;
+                    break;
+                }
+            }
+
+            if (!modified) {
+                alert('No changes detected. Please modify at least one script before submitting.');
+                return;
+            }
+
+            // Save scripts to localStorage
+            localStorage.setItem('modifiedScripts', JSON.stringify(scripts));
+            localStorage.setItem('scriptsModified', 'true');
+
+            // Show confirmation
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Changes Saved!';
+            btn.style.background = '#10b981';
+            btn.disabled = true;
+
+            // Redirect to results page after a brief delay
+            setTimeout(() => {
+                window.location.href = 'results.html';
+            }, 1000);
+        }
+
+        // Check if there are unsaved changes when leaving the page
+        window.addEventListener('beforeunload', (e) => {
+            const scripts = {
+                quality: document.getElementById('quality-script').value,
+                base: document.getElementById('base-script').value,
+                length: document.getElementById('length-script').value,
+                volcano: document.getElementById('volcano-script').value
+            };
+
+            let modified = false;
+            for (const key in scripts) {
+                if (scripts[key] !== originalScripts[key]) {
+                    modified = true;
+                    break;
+                }
+            }
+
+            if (modified) {
+                // Note: Modern browsers ignore custom messages
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
     </script>
 </body>
 </html>
