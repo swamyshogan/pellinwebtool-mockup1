@@ -19,16 +19,26 @@
 
         .navbar {
             background: white;
-            padding: 20px 40px;
+            padding: 0;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-header {
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #e5e7eb;
         }
 
         .navbar h1 {
             color: #2d3748;
             font-size: 24px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
         }
 
         .back-btn {
@@ -46,25 +56,45 @@
             background: #5568d3;
         }
 
-        .script-btn {
-            padding: 10px 20px;
-            background: #48bb78;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
-            margin-right: 10px;
-        }
-
-        .script-btn:hover {
-            background: #38a169;
-        }
-
-        .nav-buttons {
+        .tabs-nav {
             display: flex;
-            gap: 10px;
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab-nav {
+            padding: 16px 32px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-nav:hover {
+            color: #3b82f6;
+            background: #f3f4f6;
+        }
+
+        .tab-nav.active {
+            color: #1e3a8a;
+            border-bottom-color: #3b82f6;
+            background: white;
+        }
+
+        .script-modified-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            background: #f59e0b;
+            color: white;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
         }
 
         .container {
@@ -198,10 +228,18 @@
 </head>
 <body>
     <div class="navbar">
-        <h1>🧬 Analysis Results</h1>
-        <div class="nav-buttons">
-            <button class="script-btn" onclick="window.location.href='scripts.html'">📜 View Analysis Script</button>
-            <button class="back-btn" onclick="window.history.back()">← Back to Upload</button>
+        <div class="navbar-header">
+            <h1>🧬 Analysis Results</h1>
+            <div class="nav-buttons">
+                <button class="back-btn" onclick="window.location.href='index.html'">← Back to Upload</button>
+            </div>
+        </div>
+        <div class="tabs-nav">
+            <button class="tab-nav active" onclick="switchTab('results')">Results</button>
+            <button class="tab-nav" onclick="window.location.href='scripts.html'" id="scripts-tab">
+                Edit Analysis Script
+                <span class="script-modified-badge" id="modified-badge" style="display: none;">Modified</span>
+            </button>
         </div>
     </div>
 
@@ -721,6 +759,32 @@
             });
         }
 
+        // Check if scripts were modified
+        function checkScriptModifications() {
+            const scriptsModified = localStorage.getItem('scriptsModified');
+            if (scriptsModified === 'true') {
+                document.getElementById('modified-badge').style.display = 'inline-block';
+                // Add visual indicator to charts
+                document.querySelectorAll('.chart-title').forEach(title => {
+                    title.style.position = 'relative';
+                    if (!title.querySelector('.script-indicator')) {
+                        const indicator = document.createElement('span');
+                        indicator.className = 'script-indicator';
+                        indicator.style.cssText = 'margin-left: 8px; padding: 2px 6px; background: #f59e0b; color: white; border-radius: 8px; font-size: 10px; font-weight: 600;';
+                        indicator.textContent = 'Custom';
+                        title.appendChild(indicator);
+                    }
+                });
+            }
+        }
+
+        function switchTab(tabName) {
+            if (tabName === 'results') {
+                // Already on results page
+                return;
+            }
+        }
+
         // Initialize
         window.onload = () => {
             generateMockData();
@@ -728,6 +792,7 @@
             drawBaseChart();
             drawLengthChart();
             drawVolcanoPlot();
+            checkScriptModifications();
         };
 
         // Redraw on resize
