@@ -366,6 +366,108 @@
         .d3-tooltip.show {
             opacity: 1;
         }
+
+        .volcano-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .volcano-plot-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .selected-genes-panel {
+            width: 280px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .selected-genes-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .gene-count {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .selected-genes-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+
+        .gene-item {
+            background: white;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            font-size: 13px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .gene-item:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .gene-name {
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .gene-fc {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .gene-fc.up {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .gene-fc.down {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+
+        .no-selection {
+            color: #94a3b8;
+            font-size: 13px;
+            text-align: center;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+
+        @media (max-width: 968px) {
+            .volcano-container {
+                flex-direction: column;
+            }
+            
+            .selected-genes-panel {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -453,8 +555,21 @@
                 🌋 Volcano Plot - Differential Expression (Brushable)
                 <span class="badge">DESeq2 Analysis</span>
             </div>
-            <div class="chart-container" style="height: 500px;" id="volcano-chart">
-                <div class="d3-tooltip" id="d3-volcano-tooltip"></div>
+            <div class="volcano-container">
+                <div class="volcano-plot-wrapper">
+                    <div class="chart-container" style="height: 500px;" id="volcano-chart">
+                        <div class="d3-tooltip" id="d3-volcano-tooltip"></div>
+                    </div>
+                </div>
+                <div class="selected-genes-panel">
+                    <div class="selected-genes-header">
+                        Selected Genes
+                        <span class="gene-count" id="gene-count">0</span>
+                    </div>
+                    <div class="selected-genes-list" id="selected-genes-list">
+                        <div class="no-selection">Brush the plot to select genes</div>
+                    </div>
+                </div>
             </div>
             <div class="legend">
                 <div class="legend-item">
@@ -989,13 +1104,25 @@
                 .call(brush);
 
             function brushed(event) {
+                const geneListContainer = document.getElementById('selected-genes-list');
+                const geneCountBadge = document.getElementById('gene-count');
+                
                 if (!event.selection) {
                     // Reset all points
                     points.attr('opacity', 0.7);
+                    geneListContainer.innerHTML = '<div class="no-selection">Brush the plot to select genes</div>';
+                    geneCountBadge.textContent = '0';
                     return;
                 }
 
                 const [[x0, y0], [x1, y1]] = event.selection;
+                
+                // Get selected genes
+                const selected = genes.filter(d => {
+                    const cx = xScale(d.log2FC);
+                    const cy = yScale(d.negLog10P);
+                    return (x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1);
+                });
                 
                 // Highlight selected points
                 points.attr('opacity', d => {
@@ -1004,15 +1131,32 @@
                     return (x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1) ? 1 : 0.2;
                 });
 
-                // Log selected genes to console (could be used for further analysis)
-                if (event.type === 'end' && event.selection) {
-                    const selected = genes.filter(d => {
-                        const cx = xScale(d.log2FC);
-                        const cy = yScale(d.negLog10P);
-                        return (x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1);
-                    });
-                    console.log(`Selected ${selected.length} genes:`, selected.map(d => d.name));
+                // Update the gene count badge
+                geneCountBadge.textContent = selected.length;
+
+                // Display selected genes in the side panel
+                if (selected.length === 0) {
+                    geneListContainer.innerHTML = '<div class="no-selection">No genes in selection</div>';
+                } else {
+                    // Sort by absolute fold change (most significant first)
+                    selected.sort((a, b) => Math.abs(b.log2FC) - Math.abs(a.log2FC));
+                    
+                    const genesHTML = selected.map(gene => {
+                        const fcClass = gene.log2FC > 0 ? 'up' : 'down';
+                        const fcText = gene.log2FC > 0 ? '+' : '';
+                        return `
+                            <div class="gene-item">
+                                <span class="gene-name">${gene.name}</span>
+                                <span class="gene-fc ${fcClass}">${fcText}${gene.log2FC.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    geneListContainer.innerHTML = genesHTML;
                 }
+
+                // Also log to console for further analysis
+                console.log(`Selected ${selected.length} genes:`, selected.map(d => d.name));
             }
         }
 
