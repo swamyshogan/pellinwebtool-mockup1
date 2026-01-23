@@ -34,6 +34,25 @@
         .navbar h1 {
             color: #2d3748;
             font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .back-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
         }
 
         .tabs-nav {
@@ -275,15 +294,19 @@
 <body>
     <div class="navbar">
         <div class="navbar-header">
-            <h1>Pellin Web Tool</h1>
+            <h1>Analysis Scripts</h1>
+            <div class="nav-buttons">
+                <button class="back-btn" onclick="window.location.href='results.html'">Back to Results</button>
+            </div>
         </div>
         <div class="tabs-nav">
             <button class="tab-nav" onclick="window.location.href='results.html'">Results</button>
-            <button class="tab-nav active">Edit Analysis Script</button>
+            <button class="tab-nav active">Analysis Script</button>
         </div>
     </div>
 
     <div class="container">
+        <!---
         <div class="page-header">
             <h2>Edit Analysis Scripts</h2>
             <p>Modify the scripts used to generate each visualization. Changes will be applied when you submit.</p>
@@ -292,19 +315,20 @@
         <div class="info-box">
             <p>💡 <strong>Note:</strong> This is a mockup interface. Script modifications will be saved and reflected visually on the results page.</p>
         </div>
+        --->
 
-        <!-- Quality Score Distribution Script -->
+        <!-- Quality Score Distribution Script (R) -->
         <div class="script-section">
             <div class="script-section-header">
-                <div class="script-section-title">Quality Score Distribution</div>
+                <div class="script-section-title">Quality Score Distribution (R)</div>
             </div>
             <div class="script-description">
-                JavaScript code for generating the quality score distribution chart showing R1 and R2 read quality across positions.
+                R script for generating the quality score distribution chart showing R1 and R2 read quality across positions.
             </div>
             <div class="code-editor-wrapper">
                 <div class="code-editor-header">
                     <div class="code-editor-header-left">
-                        <span class="code-language">JavaScript</span>
+                        <span class="code-language">R</span>
                     </div>
                     <div class="code-editor-header-right">
                         <div class="code-dot red"></div>
@@ -312,326 +336,300 @@
                         <div class="code-dot green"></div>
                     </div>
                 </div>
-                <textarea class="code-editor" id="quality-script" spellcheck="false">function drawQualityChart() {
-    const canvas = document.getElementById('qualityCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    canvas.width = canvas.offsetWidth * 2;
-    canvas.height = canvas.offsetHeight * 2;
-    ctx.scale(2, 2);
+                <textarea class="code-editor" id="quality-script-r" spellcheck="false">draw_quality_chart <- function() {
+            # Set up the canvas
+            canvas_width <- 800
+            canvas_height <- 400
+            padding <- 40
+            graph_width <- canvas_width - 2 * padding
+            graph_height <- canvas_height - 2 * padding
 
-    const width = canvas.offsetWidth;
-    const height = canvas.offsetHeight;
-    const padding = 40;
-    const graphWidth = width - 2 * padding;
-    const graphHeight = height - 2 * padding;
+            # Generate data
+            positions <- 150
+            r1_data <- 30 + runif(positions, 0, 8) + sin(seq(1, positions) / 20) * 2
+            r2_data <- 28 + runif(positions, 0, 8) + sin(seq(1, positions) / 15) * 3
 
-    // Generate data
-    const positions = 150;
-    const r1Data = Array(positions).fill(0).map((_, i) => 
-        30 + Math.random() * 8 + Math.sin(i / 20) * 2
-    );
-    const r2Data = Array(positions).fill(0).map((_, i) => 
-        28 + Math.random() * 8 + Math.sin(i / 15) * 3
-    );
+            # Create the plot
+            plot(seq(1, positions), r1_data, type='l', col='#667eea', lwd=2, ylim=c(0, 40), 
+                 xlab='Position', ylab='Quality Score', main='Quality Score Distribution', 
+                 xaxt='n', yaxt='n')
+            axis(1, at=seq(1, positions, by=10))
+            axis(2, at=seq(0, 40, by=5))
 
-    // Draw axes and grid
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(padding, padding);
-    ctx.lineTo(padding, height - padding);
-    ctx.lineTo(width - padding, height - padding);
-    ctx.stroke();
+            # Add R2 data
+            lines(seq(1, positions), r2_data, col='#f6ad55', lwd=2)
 
-    // Draw R1 and R2 data lines
-    ctx.strokeStyle = '#667eea';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    r1Data.forEach((val, i) => {
-        const x = padding + (i / positions) * graphWidth;
-        const y = height - padding - ((val / 40) * graphHeight);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    ctx.strokeStyle = '#f6ad55';
-    ctx.beginPath();
-    r2Data.forEach((val, i) => {
-        const x = padding + (i / positions) * graphWidth;
-        const y = height - padding - ((val / 40) * graphHeight);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-}</textarea>
-            </div>
-            <div class="script-actions">
-                <button class="btn btn-secondary" onclick="resetScript('quality-script', 'quality')">Reset</button>
-            </div>
-        </div>
-
-        <!-- Base Composition Script -->
-        <div class="script-section">
-            <div class="script-section-header">
-                <div class="script-section-title">Base Composition Chart</div>
-            </div>
-            <div class="script-description">
-                JavaScript code for generating the pie chart showing nucleotide composition (A, T, G, C percentages).
-            </div>
-            <div class="code-editor-wrapper">
-                <div class="code-editor-header">
-                    <div class="code-editor-header-left">
-                        <span class="code-language">JavaScript</span>
-                    </div>
-                    <div class="code-editor-header-right">
-                        <div class="code-dot red"></div>
-                        <div class="code-dot yellow"></div>
-                        <div class="code-dot green"></div>
-                    </div>
-                </div>
-                <textarea class="code-editor" id="base-script" spellcheck="false">function drawBaseChart() {
-    const canvas = document.getElementById('baseCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    canvas.width = canvas.offsetWidth * 2;
-    canvas.height = canvas.offsetHeight * 2;
-    ctx.scale(2, 2);
-
-    const width = canvas.offsetWidth;
-    const height = canvas.offsetHeight;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const radius = Math.min(width, height) / 2 - 40;
-
-    const bases = ['A', 'T', 'G', 'C'];
-    const percentages = [28.5, 28.2, 21.8, 21.5];
-    const colors = ['#48bb78', '#f6ad55', '#667eea', '#ed64a6'];
-
-    let currentAngle = -Math.PI / 2;
-
-    percentages.forEach((pct, i) => {
-        const sliceAngle = (pct / 100) * 2 * Math.PI;
-        
-        ctx.fillStyle = colors[i];
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
-        ctx.closePath();
-        ctx.fill();
-
-        // Label
-        const labelAngle = currentAngle + sliceAngle / 2;
-        const labelX = centerX + Math.cos(labelAngle) * (radius * 0.7);
-        const labelY = centerY + Math.sin(labelAngle) * (radius * 0.7);
-        
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 18px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(bases[i], labelX, labelY);
-        
-        ctx.font = '12px sans-serif';
-        ctx.fillText(pct + '%', labelX, labelY + 20);
-
-        currentAngle += sliceAngle;
-    });
-}</textarea>
-            </div>
-            <div class="script-actions">
-                <button class="btn btn-secondary" onclick="resetScript('base-script', 'base')">Reset</button>
-            </div>
-        </div>
-
-        <!-- Read Length Distribution Script -->
-        <div class="script-section">
-            <div class="script-section-header">
-                <div class="script-section-title">Read Length Distribution</div>
-            </div>
-            <div class="script-description">
-                JavaScript code for generating the histogram showing the distribution of read lengths.
-            </div>
-            <div class="code-editor-wrapper">
-                <div class="code-editor-header">
-                    <div class="code-editor-header-left">
-                        <span class="code-language">JavaScript</span>
-                    </div>
-                    <div class="code-editor-header-right">
-                        <div class="code-dot red"></div>
-                        <div class="code-dot yellow"></div>
-                        <div class="code-dot green"></div>
-                    </div>
-                </div>
-                <textarea class="code-editor" id="length-script" spellcheck="false">function drawLengthChart() {
-    const canvas = document.getElementById('lengthCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    canvas.width = canvas.offsetWidth * 2;
-    canvas.height = canvas.offsetHeight * 2;
-    ctx.scale(2, 2);
-
-    const width = canvas.offsetWidth;
-    const height = canvas.offsetHeight;
-    const padding = 40;
-    const graphWidth = width - 2 * padding;
-    const graphHeight = height - 2 * padding;
-
-    // Generate histogram data
-    const bins = 20;
-    const data = Array(bins).fill(0).map((_, i) => {
-        const peak = bins / 2;
-        const distance = Math.abs(i - peak);
-        return Math.exp(-distance * distance / 10) * 100 + Math.random() * 10;
-    });
-
-    const maxVal = Math.max(...data);
-
-    // Draw axes
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(padding, padding);
-    ctx.lineTo(padding, height - padding);
-    ctx.lineTo(width - padding, height - padding);
-    ctx.stroke();
-
-    // Draw bars
-    const barWidth = graphWidth / bins;
-    data.forEach((val, i) => {
-        const barHeight = (val / maxVal) * graphHeight;
-        const x = padding + i * barWidth;
-        const y = height - padding - barHeight;
-
-        const gradient = ctx.createLinearGradient(x, y, x, height - padding);
-        gradient.addColorStop(0, '#667eea');
-        gradient.addColorStop(1, '#764ba2');
-
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x + 2, y, barWidth - 4, barHeight);
-    });
-}</textarea>
-            </div>
-            <div class="script-actions">
-                <button class="btn btn-secondary" onclick="resetScript('length-script', 'length')">Reset</button>
-            </div>
-        </div>
-
-        <!-- Volcano Plot Script -->
-        <div class="script-section">
-            <div class="script-section-header">
-                <div class="script-section-title">Volcano Plot - Differential Expression</div>
-            </div>
-            <div class="script-description">
-                JavaScript code for generating the volcano plot showing differentially expressed genes with log2 fold change and adjusted p-values.
-            </div>
-            <div class="code-editor-wrapper">
-                <div class="code-editor-header">
-                    <div class="code-editor-header-left">
-                        <span class="code-language">JavaScript</span>
-                    </div>
-                    <div class="code-editor-header-right">
-                        <div class="code-dot red"></div>
-                        <div class="code-dot yellow"></div>
-                        <div class="code-dot green"></div>
-                    </div>
-                </div>
-                <textarea class="code-editor" id="volcano-script" spellcheck="false">function drawVolcanoPlot() {
-    const canvas = document.getElementById('volcanoCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    canvas.width = canvas.offsetWidth * 2;
-    canvas.height = canvas.offsetHeight * 2;
-    ctx.scale(2, 2);
-
-    const width = canvas.offsetWidth;
-    const height = canvas.offsetHeight;
-    const padding = 60;
-    const graphWidth = width - 2 * padding;
-    const graphHeight = height - 2 * padding;
-
-    // Generate mock differential expression data
-    const numGenes = 500;
-    const genes = [];
-    const geneNames = ['GREM1', 'TP53', 'EGFR', 'KRAS', 'BRCA1', 'MYC', 'PTEN', 'AKT1', 'VEGFA', 'TGFB1'];
-    
-    for (let i = 0; i < numGenes; i++) {
-        const log2FC = (Math.random() - 0.5) * 8;
-        const negLog10P = Math.random() * 6;
-        
-        const isSignificant = Math.random() > 0.85;
-        const finalNegLog10P = isSignificant ? 2 + Math.random() * 4 : negLog10P;
-        
-        genes.push({
-            log2FC: log2FC,
-            negLog10P: finalNegLog10P,
-            name: i < geneNames.length ? geneNames[i] : `Gene${i}`,
-            isLabeled: i < geneNames.length
-        });
-    }
-
-    // Draw axes and points
-    const minFC = -4;
-    const maxFC = 4;
-    const maxP = 6;
-
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(padding, padding);
-    ctx.lineTo(padding, height - padding);
-    ctx.lineTo(width - padding, height - padding);
-    ctx.stroke();
-
-    // Draw points
-    genes.forEach(gene => {
-        const x = padding + ((gene.log2FC - minFC) / (maxFC - minFC)) * graphWidth;
-        const y = height - padding - (gene.negLog10P / maxP) * graphHeight;
-        
-        let color = '#a0aec0';
-        if (gene.negLog10P > 1.3 && Math.abs(gene.log2FC) > 1) {
-            color = gene.log2FC > 0 ? '#e53e3e' : '#3182ce';
+            # Add grid
+            grid()
         }
-        
-        ctx.fillStyle = color;
-        ctx.globalAlpha = 0.6;
-        ctx.beginPath();
-        ctx.arc(x, y, 3, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-    });
-}</textarea>
+
+        # Call the function to draw the chart
+        draw_quality_chart()</textarea>
             </div>
             <div class="script-actions">
-                <button class="btn btn-secondary" onclick="resetScript('volcano-script', 'volcano')">Reset</button>
+                <button class="btn btn-secondary" onclick="DownloadScript('quality-script-r', 'quality_r')">Download</button>
+                <button class="btn btn-secondary" onclick="scriptAdvanced()">Edit (Advanced)</button>
             </div>
         </div>
 
-        <!-- Submit Section -->
+        <!-- Base Composition Script (Python) -->
+        <div class="script-section">
+            <div class="script-section-header">
+            <div class="script-section-title">Base Composition Chart (Python)</div>
+            </div>
+            <div class="script-description">
+            Python script for analyzing and generating a pie chart showing nucleotide composition (A, T, G, C percentages).
+            </div>
+            <div class="code-editor-wrapper">
+            <div class="code-editor-header">
+                <div class="code-editor-header-left">
+                <span class="code-language">Python</span>
+                </div>
+                <div class="code-editor-header-right">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+                </div>
+            </div>
+            <textarea class="code-editor" id="base-script" spellcheck="false">import matplotlib.pyplot as plt
+    from collections import Counter
+
+    def analyze_base_composition(fastq_file):
+        """
+        Analyze base composition from FASTQ file
+        """
+        bases = {'A': 0, 'T': 0, 'G': 0, 'C': 0}
+        
+        with open(fastq_file, 'r') as f:
+        lines = f.readlines()
+        for i in range(1, len(lines), 4):
+            sequence = lines[i].strip().upper()
+            for base in sequence:
+            if base in bases:
+                bases[base] += 1
+        
+        return bases
+
+    def plot_base_composition(fastq_file, output_file='base_composition.png'):
+        """
+        Generate pie chart of base composition
+        """
+        bases = analyze_base_composition(fastq_file)
+        total = sum(bases.values())
+        percentages = {base: (count / total) * 100 for base, count in bases.items()}
+        
+        fig, ax = plt.subplots(figsize=(10, 8))
+        
+        labels = list(percentages.keys())
+        values = list(percentages.values())
+        colors = ['#48bb78', '#f6ad55', '#667eea', '#ed64a6']
+        
+        wedges, texts, autotexts = ax.pie(values, labels=labels, autopct='%1.1f%%', 
+                        colors=colors, startangle=90, textprops={'fontsize': 12})
+        
+        for autotext in autotexts:
+        autotext.set_color('white')
+        autotext.set_fontweight('bold')
+        
+        ax.set_title('Base Composition', fontsize=14, fontweight='bold')
+        plt.tight_layout()
+        plt.savefig(output_file, dpi=300)
+        plt.close()
+
+    if __name__ == '__main__':
+        plot_base_composition('input.fastq')</textarea>
+            </div>
+            <div class="script-actions">
+            <button class="btn btn-secondary" onclick="DownloadScript('base-script', 'base')">Download</button>
+            <button class="btn btn-secondary" onclick="scriptAdvanced()">Edit (Advanced)</button>
+            </div>
+        </div>
+
+
+        <!-- Read Length Distribution Script (Python) -->
+        <div class="script-section">
+            <div class="script-section-header">
+            <div class="script-section-title">Read Length Distribution (Python)</div>
+            </div>
+            <div class="script-description">
+            Python script for analyzing and generating the read length distribution histogram from sequencing data.
+            </div>
+            <div class="code-editor-wrapper">
+            <div class="code-editor-header">
+                <div class="code-editor-header-left">
+                <span class="code-language">Python</span>
+                </div>
+                <div class="code-editor-header-right">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+                </div>
+            </div>
+            <textarea class="code-editor" id="read-length-python" spellcheck="false">import numpy as np
+    import matplotlib.pyplot as plt
+    from collections import Counter
+
+    def analyze_read_lengths(fastq_file):
+        """
+        Analyze read length distribution from FASTQ file
+        """
+        read_lengths = []
+        
+        with open(fastq_file, 'r') as f:
+        lines = f.readlines()
+        for i in range(1, len(lines), 4):
+            sequence = lines[i].strip()
+            read_lengths.append(len(sequence))
+        
+        return read_lengths
+
+    def plot_read_length_distribution(read_lengths, output_file='read_length_dist.png'):
+        """
+        Generate histogram of read length distribution
+        """
+        fig, ax = plt.subplots(figsize=(12, 6))
+        
+        ax.hist(read_lengths, bins=50, color='#667eea', edgecolor='#764ba2', alpha=0.7)
+        ax.set_xlabel('Read Length (bp)', fontsize=12)
+        ax.set_ylabel('Frequency', fontsize=12)
+        ax.set_title('Read Length Distribution', fontsize=14, fontweight='bold')
+        ax.grid(axis='y', alpha=0.3)
+        
+        stats_text = f"Mean: {np.mean(read_lengths):.0f} bp\nMedian: {np.median(read_lengths):.0f} bp\nStdDev: {np.std(read_lengths):.0f} bp"
+        ax.text(0.98, 0.97, stats_text, transform=ax.transAxes, verticalalignment='top', 
+            horizontalalignment='right', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+        
+        plt.tight_layout()
+        plt.savefig(output_file, dpi=300)
+        plt.close()
+
+    if __name__ == '__main__':
+        read_lengths = analyze_read_lengths('input.fastq')
+        plot_read_length_distribution(read_lengths)</textarea>
+            </div>
+            <div class="script-actions">
+            <button class="btn btn-secondary" onclick="DownloadScript('read-length-python', 'read_length_analysis')">Download</button>
+            <button class="btn btn-secondary" onclick="scriptAdvanced()">Edit (Advanced)</button>
+            </div>
+        </div>
+
+        <!-- Volcano Plot Script (Python) -->
+        <div class="script-section">
+            <div class="script-section-header">
+            <div class="script-section-title">Volcano Plot - Differential Expression (Python)</div>
+            </div>
+            <div class="script-description">
+            Python script for generating volcano plots showing differentially expressed genes with log2 fold change and adjusted p-values.
+            </div>
+            <div class="code-editor-wrapper">
+            <div class="code-editor-header">
+                <div class="code-editor-header-left">
+                <span class="code-language">Python</span>
+                </div>
+                <div class="code-editor-header-right">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+                </div>
+            </div>
+            <textarea class="code-editor" id="volcano-script" spellcheck="false">import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from scipy import stats
+
+    def perform_differential_expression(counts_file, metadata_file):
+        """
+        Perform differential expression analysis
+        """
+        counts = pd.read_csv(counts_file, index_col=0)
+        metadata = pd.read_csv(metadata_file, index_col=0)
+        
+        # Separate groups
+        control = counts[metadata['condition'] == 'control'].values
+        treatment = counts[metadata['condition'] == 'treatment'].values
+        
+        results = []
+        for gene in counts.index:
+        gene_idx = counts.index.get_loc(gene)
+        ctrl_expr = control[:, gene_idx]
+        treat_expr = treatment[:, gene_idx]
+        
+        # Calculate log2 fold change
+        log2fc = np.log2(treat_expr.mean() + 1) - np.log2(ctrl_expr.mean() + 1)
+        
+        # T-test p-value
+        t_stat, p_val = stats.ttest_ind(treat_expr, ctrl_expr)
+        neg_log10_p = -np.log10(p_val) if p_val > 0 else 10
+        
+        results.append({
+            'gene': gene,
+            'log2fc': log2fc,
+            'p_value': p_val,
+            'neg_log10_p': neg_log10_p
+        })
+        
+        return pd.DataFrame(results)
+
+    def plot_volcano(de_results, output_file='volcano_plot.png', fc_threshold=1, p_threshold=0.05):
+        """
+        Generate volcano plot
+        """
+        fig, ax = plt.subplots(figsize=(10, 8))
+        
+        neg_log10_p_threshold = -np.log10(p_threshold)
+        
+        colors = []
+        for _, row in de_results.iterrows():
+        if abs(row['log2fc']) > fc_threshold and row['neg_log10_p'] > neg_log10_p_threshold:
+            colors.append('#e53e3e' if row['log2fc'] > 0 else '#3182ce')
+        else:
+            colors.append('#a0aec0')
+        
+        ax.scatter(de_results['log2fc'], de_results['neg_log10_p'], c=colors, alpha=0.6, s=50)
+        
+        ax.axvline(-fc_threshold, color='gray', linestyle='--', alpha=0.5)
+        ax.axvline(fc_threshold, color='gray', linestyle='--', alpha=0.5)
+        ax.axhline(neg_log10_p_threshold, color='gray', linestyle='--', alpha=0.5)
+        
+        ax.set_xlabel('log2(Fold Change)', fontsize=12)
+        ax.set_ylabel('-log10(p-value)', fontsize=12)
+        ax.set_title('Volcano Plot - Differential Expression', fontsize=14, fontweight='bold')
+        ax.grid(axis='both', alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(output_file, dpi=300)
+        plt.close()
+
+    if __name__ == '__main__':
+        de_results = perform_differential_expression('counts.csv', 'metadata.csv')
+        plot_volcano(de_results)</textarea>
+            </div>
+            <div class="script-actions">
+            <button class="btn btn-secondary" onclick="DownloadScript('volcano-script', 'volcano')">Download</button>
+            <button class="btn btn-secondary" onclick="scriptAdvanced()">Edit (Advanced)</button>
+            </div>
+        </div>
+
         <div class="submit-all-section">
-            <h3>Apply Script Changes</h3>
-            <p>Review your script modifications and click submit to apply changes to the analysis results.</p>
-            <button class="btn btn-primary btn-large" onclick="submitScripts()">✓ Submit All Changes</button>
+            <h3>Download All Scripts</h3>
+            <button class="btn btn-primary btn-large" onclick="submitScripts()">Download ALL</button>
         </div>
     </div>
 
     <script>
-        // Store original scripts
-        const originalScripts = {
-            quality: document.getElementById('quality-script').value,
-            base: document.getElementById('base-script').value,
-            length: document.getElementById('length-script').value,
-            volcano: document.getElementById('volcano-script').value
-        };
-
-        function resetScript(textareaId, scriptKey) {
-            if (confirm('Are you sure you want to reset this script to its original version?')) {
-                document.getElementById(textareaId).value = originalScripts[scriptKey];
-            }
+        function DownloadScript(textareaId, scriptKey) {
+            const textarea = document.getElementById(textareaId);
+            const scriptName = scriptKey.charAt(0).toUpperCase() + scriptKey.slice(1);
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textarea.value));
+            element.setAttribute('download', `${scriptKey}-script.py`);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
         }
 
         function submitScripts() {
-            // Get all script values
             const scripts = {
                 quality: document.getElementById('quality-script').value,
                 base: document.getElementById('base-script').value,
@@ -639,60 +637,31 @@
                 volcano: document.getElementById('volcano-script').value
             };
 
-            // Check if any scripts were modified
-            let modified = false;
-            for (const key in scripts) {
-                if (scripts[key] !== originalScripts[key]) {
-                    modified = true;
-                    break;
-                }
-            }
-
-            if (!modified) {
-                alert('No changes detected. Please modify at least one script before submitting.');
-                return;
-            }
-
-            // Save scripts to localStorage
-            localStorage.setItem('modifiedScripts', JSON.stringify(scripts));
-            localStorage.setItem('scriptsModified', 'true');
+            // Create a zip file or download all scripts
+            const scriptNames = ['quality', 'base', 'length', 'volcano'];
+            scriptNames.forEach(scriptKey => {
+                const element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(scripts[scriptKey]));
+                element.setAttribute('download', `${scriptKey}-script.js`);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            });
 
             // Show confirmation
             const btn = event.target;
             const originalText = btn.textContent;
-            btn.textContent = '✓ Changes Saved!';
+            btn.textContent = '✓ Download Started!';
             btn.style.background = '#10b981';
             btn.disabled = true;
 
-            // Redirect to results page after a brief delay
             setTimeout(() => {
-                window.location.href = 'results.html';
-            }, 1000);
+                btn.textContent = originalText;
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 2000);
         }
-
-        // Check if there are unsaved changes when leaving the page
-        window.addEventListener('beforeunload', (e) => {
-            const scripts = {
-                quality: document.getElementById('quality-script').value,
-                base: document.getElementById('base-script').value,
-                length: document.getElementById('length-script').value,
-                volcano: document.getElementById('volcano-script').value
-            };
-
-            let modified = false;
-            for (const key in scripts) {
-                if (scripts[key] !== originalScripts[key]) {
-                    modified = true;
-                    break;
-                }
-            }
-
-            if (modified) {
-                // Note: Modern browsers ignore custom messages
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
     </script>
 </body>
 </html>
