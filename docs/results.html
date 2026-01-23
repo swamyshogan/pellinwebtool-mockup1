@@ -468,6 +468,52 @@
                 width: 100%;
             }
         }
+
+        /* Scatterplot Matrix Styles */
+        .splom-container {
+            position: relative;
+        }
+
+        .splom-cell {
+            fill: none;
+            stroke: #e2e8f0;
+            stroke-width: 1;
+        }
+
+        .splom-point {
+            fill-opacity: 0.6;
+            stroke: white;
+            stroke-width: 0.5;
+        }
+
+        .splom-point.selected {
+            fill: #3b82f6;
+            fill-opacity: 1;
+            stroke: #1e3a8a;
+            stroke-width: 1.5;
+        }
+
+        .splom-point.faded {
+            fill-opacity: 0.1;
+        }
+
+        .splom-axis {
+            font-size: 10px;
+            color: #94a3b8;
+        }
+
+        .splom-label {
+            font-size: 12px;
+            font-weight: 600;
+            fill: #475569;
+        }
+
+        .splom-brush .selection {
+            fill: steelblue;
+            fill-opacity: 0.15;
+            stroke: #3b82f6;
+            stroke-width: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -584,6 +630,15 @@
                     <div class="legend-color" style="background: #a0aec0;"></div>
                     <span>Not significant</span>
                 </div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-title">
+                🔬 Scatterplot Matrix - Multi-dimensional Analysis
+                <span class="badge">Interactive SPLOM</span>
+            </div>
+            <div class="splom-container" id="splom-container" style="height: 600px;">
             </div>
         </div>
     </div>
@@ -1160,6 +1215,185 @@
             }
         }
 
+        // Draw Scatterplot Matrix (SPLOM)
+        function drawSplom() {
+            // Clear previous
+            d3.select('#splom-container svg').remove();
+            
+            const container = document.getElementById('splom-container');
+            const width = container.offsetWidth;
+            const height = container.offsetHeight;
+            const padding = 20;
+            
+            // Dimensions for the matrix
+            const dimensions = ['Gene Expression', 'Protein Level', 'Methylation', 'Copy Number'];
+            const n = dimensions.length;
+            const size = (Math.min(width, height) - padding) / n - padding;
+            
+            // Generate dummy multi-dimensional data
+            const numSamples = 200;
+            const data = [];
+            
+            for (let i = 0; i < numSamples; i++) {
+                const sample = {
+                    id: i,
+                    selected: false
+                };
+                
+                // Generate correlated data for realistic patterns
+                const base1 = Math.random();
+                const base2 = Math.random();
+                
+                sample['Gene Expression'] = base1 * 10 + Math.random() * 2;
+                sample['Protein Level'] = base1 * 8 + Math.random() * 3 + 1;
+                sample['Methylation'] = (1 - base2) * 100;
+                sample['Copy Number'] = base2 * 4 + Math.random() * 1;
+                
+                data.push(sample);
+            }
+            
+            // Create SVG
+            const svg = d3.select('#splom-container')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Create scales for each dimension
+            const scales = {};
+            dimensions.forEach(dim => {
+                scales[dim] = d3.scaleLinear()
+                    .domain(d3.extent(data, d => d[dim]))
+                    .range([size, 0])
+                    .nice();
+            });
+            
+            // Color scale
+            const colorScale = d3.scaleSequential(d3.interpolateViridis)
+                .domain([0, numSamples]);
+            
+            // Create cells
+            const cells = [];
+            
+            dimensions.forEach((yDim, row) => {
+                dimensions.forEach((xDim, col) => {
+                    const cell = svg.append('g')
+                        .attr('class', 'cell')
+                        .attr('transform', `translate(${col * (size + padding) + padding},${row * (size + padding) + padding})`);
+                    
+                    // Add cell background
+                    cell.append('rect')
+                        .attr('class', 'splom-cell')
+                        .attr('width', size)
+                        .attr('height', size);
+                    
+                    // Add axes for edge cells
+                    if (row === dimensions.length - 1) {
+                        // Bottom axis
+                        const xAxis = d3.axisBottom(scales[xDim]).ticks(3);
+                        cell.append('g')
+                            .attr('class', 'splom-axis')
+                            .attr('transform', `translate(0,${size})`)
+                            .call(xAxis);
+                    }
+                    
+                    if (col === 0) {
+                        // Left axis
+                        const yAxis = d3.axisLeft(scales[yDim]).ticks(3);
+                        cell.append('g')
+                            .attr('class', 'splom-axis')
+                            .call(yAxis);
+                    }
+                    
+                    // Add dimension labels
+                    if (row === 0) {
+                        cell.append('text')
+                            .attr('class', 'splom-label')
+                            .attr('x', size / 2)
+                            .attr('y', -5)
+                            .attr('text-anchor', 'middle')
+                            .text(xDim);
+                    }
+                    
+                    if (col === dimensions.length - 1) {
+                        cell.append('text')
+                            .attr('class', 'splom-label')
+                            .attr('x', size + 5)
+                            .attr('y', size / 2)
+                            .attr('text-anchor', 'start')
+                            .attr('dominant-baseline', 'middle')
+                            .text(yDim);
+                    }
+                    
+                    // Add points
+                    const points = cell.selectAll('.splom-point')
+                        .data(data)
+                        .enter()
+                        .append('circle')
+                        .attr('class', 'splom-point')
+                        .attr('cx', d => scales[xDim](d[xDim]))
+                        .attr('cy', d => scales[yDim](d[yDim]))
+                        .attr('r', 3)
+                        .attr('fill', (d, i) => colorScale(i));
+                    
+                    // Store cell info for brushing
+                    cells.push({
+                        element: cell,
+                        points: points,
+                        xDim: xDim,
+                        yDim: yDim,
+                        xScale: scales[xDim],
+                        yScale: scales[yDim]
+                    });
+                    
+                    // Add brush
+                    const brush = d3.brush()
+                        .extent([[0, 0], [size, size]])
+                        .on('start brush end', function(event) {
+                            brushCell(event, cell, points, scales[xDim], scales[yDim], xDim, yDim);
+                        });
+                    
+                    cell.append('g')
+                        .attr('class', 'splom-brush')
+                        .call(brush);
+                });
+            });
+            
+            // Brush handler
+            function brushCell(event, cell, points, xScale, yScale, xDim, yDim) {
+                let selected = [];
+                
+                if (event.selection) {
+                    const [[x0, y0], [x1, y1]] = event.selection;
+                    
+                    // Find selected points in this cell
+                    selected = data.filter(d => {
+                        const cx = xScale(d[xDim]);
+                        const cy = yScale(d[yDim]);
+                        return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
+                    });
+                    
+                    // Mark selected in data
+                    data.forEach(d => d.selected = false);
+                    selected.forEach(d => d.selected = true);
+                } else {
+                    // Clear selection
+                    data.forEach(d => d.selected = false);
+                }
+                
+                // Update all cells
+                cells.forEach(cellInfo => {
+                    cellInfo.points
+                        .classed('selected', d => d.selected)
+                        .classed('faded', d => selected.length > 0 && !d.selected);
+                });
+                
+                // Log selection
+                if (event.type === 'end' && selected.length > 0) {
+                    console.log(`Selected ${selected.length} samples in SPLOM`);
+                }
+            }
+        }
+
         // Check if scripts were modified
         function checkScriptModifications() {
             const scriptsModified = localStorage.getItem('scriptsModified');
@@ -1193,6 +1427,7 @@
             drawBaseChart();
             drawLengthChart();
             drawVolcanoPlot();
+            drawSplom();
             checkScriptModifications();
         };
 
@@ -1202,6 +1437,7 @@
             drawBaseChart();
             drawLengthChart();
             drawVolcanoPlot();
+            drawSplom();
         });
 
         // For opening script page (you can replace this with a separate HTML file)
